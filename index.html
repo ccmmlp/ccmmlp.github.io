@@ -1,39 +1,516 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ccmmlp — Coming Soon</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-JN312MQL4C"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JN312MQL4C"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JN312MQL4C');
+</script>
+<title>Off the Planckian Locus: Using 2D Chromaticity to Improve In-Camera Color</title>
+<meta name="description" content="Project page for 'Off the Planckian Locus: Using 2D Chromaticity to Improve In-Camera Color' (ECCV 2026).">
 
-    gtag('config', 'G-JN312MQL4C');
-  </script>
+<meta property="og:title" content="Off the Planckian Locus: Using 2D Chromaticity to Improve In-Camera Color">
+<meta property="og:description" content="Replacing 1D CCT interpolation with a lightweight MLP over 2D chromaticity for in-camera colorimetric mapping.">
+<!-- Change to an absolute URL once live, e.g. https://ccmmlp.github.io/images/og-teaser.png -->
+<meta property="og:image" content="images/og-teaser.png">
+<meta property="og:type" content="website">
 
-  <style>
-    html, body { height: 100%; margin: 0; }
-    body {
-      display: grid;
-      place-items: center;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      background: #0f1115;
-      color: #e5e7eb;
-    }
-    h1 { font-size: clamp(1.75rem, 4vw, 3rem); margin: 0 0 .25rem; letter-spacing: .02em; }
-    p  { margin: 0; opacity: .75; }
-    a { color: #60a5fa; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-  </style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main>
-    <h1>Future landing page of CCMMLP</h1>
-    <p style="margin-top: .75rem;">You can <a href="https://ln5.sync.com/dl/e8a199110#rmjujbfw-pn5n9qma-xf8p6stj-agizgb7u">download our dataset here</a>, code release and full preprocessed data coming soon.</p>
-  </main>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="hero">
+  <div class="wrap">
+    <p class="venue">ECCV 2026 &nbsp;&middot;&nbsp; Malm&ouml; &nbsp;&middot;&nbsp; Sept 8&ndash;12</p>
+
+    <h1>Off the Planckian Locus: Using 2D Chromaticity to Improve In-Camera Color</h1>
+
+    <p class="authors">
+      <a href="#">SaiKiran Tedla</a><sup>1,3,*</sup>
+      <a href="#">Joshua Little</a><sup>1,*</sup>
+      <a href="#">Hakki C. Karaimer</a><sup>2</sup>
+      <a href="#">Michael S. Brown</a><sup>1</sup>
+    </p>
+
+    <p class="affil">
+      <sup>1</sup>York University &nbsp;&nbsp;
+      <sup>2</sup>AI Center-Toronto, Samsung Electronics &nbsp;&nbsp;
+      <sup>3</sup>University of Toronto
+    </p>
+    <p class="note"><sup>*</sup>Equal contribution</p>
+
+    <nav class="links">
+      <a class="btn" href="https://arxiv.org/abs/2511.17133">Paper</a>
+      <span class="btn is-soon">Code &mdash; coming soon</span>
+      <a class="btn" href="https://ln5.sync.com/dl/e8a199110#rmjujbfw-pn5n9qma-xf8p6stj-agizgb7u">Dataset</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============================================================
+       TEASER — paper Fig. 1
+       ============================================================ -->
+  <figure class="teaser">
+    <img src="images/fig1-teaser.svg" alt="Angular color reproduction error for a ColorChecker chart under illuminants on and off the Planckian locus, comparing 1D interpolation with our 2D prediction">
+    <figcaption>
+      <b>1D Planckian interpolation vs. our 2D chromaticity-based prediction.</b>
+      Traditional 1D methods perform adequately for light sources whose CCTs lie close to the
+      Planckian locus, but are less accurate for sources, namely LEDs, that lie off it. Heat maps show
+      angular reproduction error, from 0&deg; (dark blue) to 15&deg; (dark red).
+    </figcaption>
+  </figure>
+
+  <!-- ============================================================
+       ABSTRACT
+       ============================================================ -->
+  <section id="abstract">
+    <h2>Abstract</h2>
+    <p>
+      Traditional in-camera colorimetric mapping relies on correlated color temperature (CCT)-based
+      interpolation between pre-calibrated transforms optimized for Planckian illuminants such as
+      CIE A and D65. However, modern lighting technologies such as LEDs can deviate substantially
+      from the Planckian locus, exposing the limitations of relying on conventional one-dimensional
+      CCT for illumination characterization. This paper demonstrates that transitioning from 1D CCT
+      (on the Planckian locus) to a 2D chromaticity space (off the Planckian locus) improves
+      colorimetric accuracy across various mapping approaches. In addition, we replace conventional
+      CCT interpolation with a lightweight multi-layer perceptron (MLP) that leverages 2D
+      chromaticity features for robust colorimetric mapping under non-Planckian illuminants. A
+      lightbox-based calibration procedure incorporating representative LED sources is used to train
+      our MLP. Validated across diverse LED lighting, our method reduces angular reproduction error
+      by <b>22% on average</b> in LED-lit scenes, maintains backward compatibility with traditional
+      illuminants, accommodates multi-illuminant scenes, and supports real-time in-camera deployment
+      with negligible additional computational cost.
+    </p>
+  </section>
+
+  <!-- ============================================================
+       VIDEO
+       ============================================================ -->
+  <section id="video">
+    <h2>Video</h2>
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/vRalX0D2IlI?si=xqZhfnSftzPxFTfI"
+              title="YouTube video player" frameborder="0" loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       THE IDEA — poster panel
+       ============================================================ -->
+  <section id="idea">
+    <h2>1D CCT vs. 2D Chromaticity</h2>
+    <p>
+      The standard procedure computes the color correction matrix by interpolating pre-calibrated
+      matrices along the Planckian locus, characterizing the light with a single number: its
+      correlated color temperature. Modern LEDs, however, exhibit chromaticities that deviate
+      significantly from that locus, where a CCT no longer describes them adequately. We therefore
+      shift from a one-dimensional CCT space to a 2D chromaticity space, and predict the matrix
+      directly.
+    </p>
+    <figure>
+      <img src="images/panel-1d-vs-2d.png" loading="lazy" alt="Our 2D chromaticity CCM-MLP approach compared with traditional 1D Planckian interpolation">
+      <figcaption>
+        <b>2D chromaticity CCM prediction vs. 1D CCT interpolation.</b>
+        Interpolation approaches assume the CCM can be derived from illuminants calibrated along the
+        Planckian locus. Our CCM-MLP instead predicts the full 3&times;3 matrix from 2D chromaticity
+        coordinates.
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- ============================================================
+       IN-CAMERA PIPELINE — poster panel
+       ============================================================ -->
+  <section id="pipeline">
+    <h2>In-Camera Pipeline</h2>
+    <p>
+      Digital cameras apply a long chain of processing routines to convert sensor-specific RGB
+      responses into a final output image. Among these, the colorimetric mapping stage maps sensor
+      values into a standard color space such as CIE&nbsp;XYZ, and its accuracy determines color
+      reproduction quality across lighting conditions.
+    </p>
+
+    <figure>
+      <img src="images/panel-pipeline.png" loading="lazy" alt="Digital in-camera pipeline overview showing six processing stages from sensor raw response to display-referred output">
+      <figcaption>
+        <b>Digital in-camera pipeline overview.</b>
+        Our work targets the color correction stage.
+      </figcaption>
+    </figure>
+
+  </section>
+
+  <!-- ============================================================
+       COLORIMETRIC MAPPING STAGE — poster panel
+       ============================================================ -->
+  <section id="colorimetric-stage">
+    <h2>Colorimetric Mapping Stage</h2>
+    <p>
+      The estimated illuminant corrects neutral colors through a diagonal white balance matrix, but
+      non-neutral colors require a further, illumination-specific 3&times;3 color correction matrix
+      (CCM) that maps white-balanced raw-RGB into CIE&nbsp;XYZ. It is this matrix that we predict, as
+      a drop-in replacement for the existing stage.
+    </p>
+
+    <figure>
+      <img src="images/panel-colorimetric-stage.png" loading="lazy" alt="Colorimetric mapping stage: raw image, white balance matrix, white balanced image, CCM, corrected output, with an illuminant estimator feeding the pipeline">
+      <figcaption>
+        <b>Colorimetric mapping stage.</b>
+        White balance handles neutral colors; the CCM handles the rest. We improve the prediction of
+        that CCM.
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- ============================================================
+       METHOD — paper Fig. 3 (stage 2) + Fig. 7
+       ============================================================ -->
+  <section id="method">
+    <h2>Method</h2>
+    <p>
+      We learn a mapping from illuminant chromaticity to a CCM. CCM-MLP is a ReLU MLP with a single
+      hidden layer of 32 neurons and eight outputs, which are reshaped into the 3&times;3 matrix; it
+      takes the illuminant's xy chromaticity as input and is trained with a cosine loss against the
+      ground-truth XYZ patches. The resulting model occupies 1.5&nbsp;KB.
+    </p>
+
+    <figure>
+      <img src="images/fig3-training.svg" loading="lazy" alt="CCM-MLP training: raw image and white patch to illuminant chromaticity, MLP predicts CCM, cosine loss against ground truth XYZ patches">
+      <figcaption>
+        <b>CCM-MLP training.</b>
+        Raw color patches are white balanced using the estimated illuminant, whose chromaticity is then
+        fed to the MLP to predict the CCM. Training minimizes a cosine loss between the corrected and
+        ground-truth XYZ patches.
+      </figcaption>
+    </figure>
+
+    <h3>Multi-illuminant extension</h3>
+    <p>
+      Assuming access to per-pixel illuminant information and a blending map, we predict and apply a
+      CCM for each illuminant to produce several corrected versions of the white-balanced image, then
+      merge them using the blending map as weights.
+    </p>
+    <figure>
+      <img src="images/panel-multi-illuminant.jpg" loading="lazy" alt="Multi-illuminant input, corrected once per illuminant, blended with a mixture map into the final sRGB output">
+      <figcaption>
+        <b>Multi-illuminant extension.</b>
+        The input is corrected once per illuminant, and the results are blended with a mixture map to
+        produce the sRGB output.
+      </figcaption>
+    </figure>
+
+  </section>
+
+  <!-- ============================================================
+       DATASET
+       ============================================================ -->
+  <section id="dataset">
+    <h2>Dataset</h2>
+    <p>
+      We capture a ColorChecker target under <b>790 illuminant spectra</b> in a modified GTI lightbox
+      fitted with tunable Telelumen LEDs, using two smartphones and two DSLRs. The illuminants cover
+      the chromaticity space well beyond the Planckian locus, and are split into 395 training, 158
+      validation, and 237 test conditions.
+    </p>
+
+    <figure>
+      <img src="images/panel-lightbox-charts.png" loading="lazy" alt="A ColorChecker chart photographed under ten different LED illuminants, showing strong and varied color casts">
+      <figcaption>
+        <b>Lightbox captures.</b>
+        The same ColorChecker target under ten of the 790 illuminants, many of which lie well off the
+        Planckian locus.
+      </figcaption>
+    </figure>
+
+    <h3>In-the-wild scenes</h3>
+    <p>
+      We further evaluate on 150 photographs taken with both smartphones under challenging LED
+      illumination, covering skin tones, posters, and craft materials.
+    </p>
+
+    <figure>
+      <!-- Carousel: 12 images, 4 visible at a time. Add or remove .car-item blocks freely. -->
+      <div class="carousel">
+        <button class="car-btn car-prev" type="button" aria-label="Previous images">&lsaquo;</button>
+        <div class="car-track">
+        <figure class="car-item">
+          <img src="images/wild/wild-01.jpg" loading="lazy" alt="flowers and ceramics under warm LED">
+        </figure>
+        <figure class="car-item">
+          <img src="images/wild/wild-02.jpg" loading="lazy" alt="two people holding a ColorChecker under magenta LED">
+        </figure>
+        <figure class="car-item">
+          <img src="images/wild/wild-03.jpg" loading="lazy" alt="library bookshelves under LED lighting">
+        </figure>
+        <figure class="car-item">
+          <img src="images/wild/wild-04.jpg" loading="lazy" alt="tabletop game pieces under blue LED">
+        </figure>
+        <figure class="car-item">
+          <img src="images/wild/wild-05.jpg" loading="lazy" alt="ball pit and bowling pins under green LED">
+        </figure>
+        <figure class="car-item">
+          <img src="images/wild/wild-06.jpg" loading="lazy" alt="potted plants on a table under green LED">
+        </figure>
+        <figure class="car-item">
+          <img src="images/wild/wild-07.jpg" loading="lazy" alt="person holding a ColorChecker in a poster-lined room">
+        </figure>
+        <figure class="car-item">
+          <img src="images/wild/wild-08.jpg" loading="lazy" alt="rolled towels and a plush toy under teal LED">
+        </figure>
+        <figure class="car-item">
+          <img src="images/wild/wild-09.jpg" loading="lazy" alt="craft pom-poms surrounding a ColorChecker">
+        </figure>
+        <figure class="car-item">
+          <img src="images/wild/wild-10.jpg" loading="lazy" alt="office corner under green LED">
+        </figure>
+        <figure class="car-item">
+          <img src="images/wild/wild-11.jpg" loading="lazy" alt="outdoor night scene with a sculpture">
+        </figure>
+        <figure class="car-item">
+          <img src="images/wild/wild-12.jpg" loading="lazy" alt="wooden chair outdoors at dusk">
+        </figure>
+        </div>
+        <button class="car-btn car-next" type="button" aria-label="Next images">&rsaquo;</button>
+      </div>
+      <figcaption>
+        <b>In-the-wild dataset.</b>
+        Real scenes under colored LED lighting, each captured with a ColorChecker present for ground
+        truth.
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- ============================================================
+       QUANTITATIVE RESULTS — tabbed
+       ============================================================ -->
+  <section id="quantitative">
+    <h2>Quantitative Results</h2>
+    <p>
+      Rows using 2D chromaticity are shaded and the best result in each column is bold; Oracle denotes
+      the upper bound given the full color chart rather than a competing method, and RP the root-
+      polynomial variant. We find that all methods benefit from a 2D chromaticity coordinate over a 1D
+      CCT.
+    </p>
+
+    <div class="tabs">
+      <button class="tab is-active" data-scene="lightbox-table">Lightbox (Pixel)</button>
+      <button class="tab" data-scene="lsmi-table">LSMI (Galaxy)</button>
+    </div>
+
+    <div class="scene is-active" data-scene="lightbox-table">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th rowspan="2">Method</th><th rowspan="2">Dim</th>
+              <th rowspan="2">Size (KB)</th><th rowspan="2">MACs (M)</th>
+              <th colspan="4">Angular error (&deg;) &darr;</th>
+            </tr>
+            <tr><th>Mean</th><th>25%</th><th>50%</th><th>90%</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Oracle</td><td>1D</td><td>0.00</td><td>0.01</td><td>2.79</td><td>0.95</td><td>2.00</td><td>5.94</td></tr>
+            <tr><td>2-CCM</td><td>1D</td><td>0.07</td><td>0.01</td><td>4.56</td><td>1.48</td><td>3.25</td><td>9.94</td></tr>
+            <tr><td>NN</td><td>1D</td><td>15.43</td><td>0.01</td><td>5.24</td><td>1.54</td><td>3.56</td><td>11.73</td></tr>
+            <tr><td>EXPINV</td><td>1D</td><td>68.53</td><td>13.39</td><td>4.31</td><td>1.26</td><td>2.85</td><td>9.88</td></tr>
+            <tr><td>CCM-MLP</td><td>1D</td><td>1.41</td><td>0.01</td><td>4.11</td><td>1.37</td><td>2.62</td><td>9.55</td></tr>
+            <tr class="hl"><td>NN</td><td>2D</td><td>16.97</td><td>0.01</td><td>4.30</td><td>1.37</td><td>2.84</td><td>9.81</td></tr>
+            <tr class="hl"><td>EXPINV</td><td>2D</td><td>69.03</td><td>13.48</td><td>3.84</td><td>1.32</td><td>2.71</td><td>8.41</td></tr>
+            <tr class="hl"><td>CCM-MLP</td><td>2D</td><td>1.54</td><td>0.01</td><td>3.60</td><td>1.22</td><td>2.38</td><td>8.18</td></tr>
+            <tr class="hl"><td><b>CCM-MLP (RP)</b></td><td>2D</td><td>2.70</td><td>0.01</td><td><b>3.27</b></td><td><b>1.13</b></td><td><b>2.14</b></td><td><b>7.47</b></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="scene" data-scene="lsmi-table">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th rowspan="2">Method</th><th rowspan="2">Dim</th>
+              <th colspan="2">Angular error (&deg;) &darr;</th>
+            </tr>
+            <tr><th>Single-illum.</th><th>Multi-illum.</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Oracle</td><td>1D</td><td>2.38</td><td>2.06</td></tr>
+            <tr><td>2-CCM</td><td>1D</td><td>5.00</td><td>3.88</td></tr>
+            <tr><td>NN</td><td>1D</td><td>4.46</td><td>3.23</td></tr>
+            <tr><td>CCM-MLP</td><td>1D</td><td>3.77</td><td>2.52</td></tr>
+            <tr><td>CCM-MLP (RP)</td><td>1D</td><td>3.60</td><td>2.35</td></tr>
+            <tr class="hl"><td>NN</td><td>2D</td><td>3.98</td><td>2.83</td></tr>
+            <tr class="hl"><td>CCM-MLP</td><td>2D</td><td>3.49</td><td>2.26</td></tr>
+            <tr class="hl"><td><b>CCM-MLP (RP)</b></td><td>2D</td><td><b>3.37</b></td><td><b>2.14</b></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <p class="note">
+      Full per-camera tables (Sony, Canon, Pixel, Samsung), &Delta;E<sub>2000</sub>, the NUS dataset,
+      and the white-point sensitivity study are in the paper.
+    </p>
+  </section>
+
+  <!-- ============================================================
+       QUALITATIVE RESULTS — tabbed
+       ============================================================ -->
+  <section id="results">
+    <h2>Qualitative Results</h2>
+
+    <div class="tabs">
+      <button class="tab is-active" data-scene="lightbox">Lightbox</button>
+      <button class="tab" data-scene="wild">In the wild</button>
+      <button class="tab" data-scene="multi">Multi-illuminant</button>
+    </div>
+
+    <div class="scene is-active" data-scene="lightbox">
+      <figure>
+        <img src="images/fig5-lightbox-results.png" loading="lazy" alt="Colorimetric mapping results on the laboratory dataset for green and blue LED illuminants, Canon and Pixel cameras">
+        <figcaption>
+          <b>Lightbox dataset.</b>
+          Results for two non-Planckian sources, a green LED (top half) and a blue LED (bottom half),
+          captured with Canon and Pixel. Methods, left to right: 3-CCM, 1D EXPINV, 1D CCM-MLP, 2D EXPINV,
+          2D CCM-MLP, and ground truth.
+        </figcaption>
+      </figure>
+    </div>
+
+    <div class="scene" data-scene="wild">
+      <figure>
+        <img src="images/fig6-in-the-wild.png" loading="lazy" alt="Colorimetric mapping results on in-the-wild captures for green and orange LED illuminants, Pixel and Samsung cameras">
+        <figcaption>
+          <b>In-the-wild captures.</b>
+          Green (top half) and orange (bottom half) LED illuminants captured with Pixel and Samsung. Note
+          the color casts introduced by EXPINV, a per-pixel method, when applied to full-size images.
+        </figcaption>
+      </figure>
+    </div>
+
+    <div class="scene" data-scene="multi">
+      <figure>
+        <img src="images/fig8-multi-illuminant.svg" loading="lazy" alt="Colorimetric mapping results on multi-illuminant scenes from the LSMI dataset, Galaxy camera">
+        <figcaption>
+          <b>Multi-illuminant scenes (LSMI).</b>
+          Two multi-illuminant scenes from the Galaxy camera, with angular errors shown at the bottom left
+          of each color chart. Methods, left to right: 2-CCM, 1D NN, 1D CCM-MLP, 2D NN, 2D CCM-MLP, and
+          Oracle.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       COMPUTATIONAL COST — paper Fig. 7
+       ============================================================ -->
+  <section id="cost">
+    <h2>Computational Cost</h2>
+
+    <p>
+      Because the CCM is computed once and applied to the entire image, CCM-MLP requires only
+      1.5&nbsp;KB and 0.01&nbsp;MMACs, compared with 69&nbsp;KB and 13&nbsp;MMACs for methods that
+      must evaluate an MLP at every pixel.
+    </p>
+    <figure>
+    <img src="images/fig7-macs-vs-resolution.svg" loading="lazy" alt="Multiply-accumulate operations versus input resolution, log scale, for 2-CCM, our 2D CCM-MLP, and 2D EXPINV">
+    <figcaption>
+      <b>Computational cost comparison.</b>
+      Multiply&ndash;accumulate operations (log scale) at different input resolutions, for 2-CCM
+      interpolation, EXPINV, and our 2D CCM-MLP.
+    </figcaption>
+    </figure>
+  </section>
+
+  <!-- ============================================================
+       MATERIALS
+       ============================================================ -->
+  <section id="downloads">
+    <h2>Materials</h2>
+    <ul class="downloads">
+      <li><a href="https://arxiv.org/abs/2511.17133">Paper (arXiv)</a></li>
+      <li>Code &mdash; coming soon</li>
+      <li><a href="https://ln5.sync.com/dl/e8a199110#rmjujbfw-pn5n9qma-xf8p6stj-agizgb7u">Dataset</a></li>
+    </ul>
+  </section>
+
+  <!-- ============================================================
+       BIBTEX
+       ============================================================ -->
+  <section id="bibtex">
+    <h2>BibTeX</h2>
+<pre><code>@inproceedings{tedla2026planckian,
+  title     = {Off the Planckian Locus: Using 2D Chromaticity to Improve In-Camera Color},
+  author    = {Tedla, SaiKiran and Little, Joshua and Karaimer, Hakki C. and Brown, Michael S.},
+  booktitle = {European Conference on Computer Vision (ECCV)},
+  year      = {2026}
+}</code></pre>
+  </section>
+
+  <!-- ============================================================
+       ACKNOWLEDGEMENTS
+       ============================================================ -->
+  <section id="acknowledgements">
+    <h2>Acknowledgements</h2>
+    <p>
+      We thank Trevor Canham, Jason J. Yu, and Konstantinos Derpanis for their valuable discussions
+      and feedback throughout this project.
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Page content &copy; the authors. Website template &mdash; feel free to reuse.</p>
+  </div>
+</footer>
+
+<!--
+  Minimal scripting: a carousel pager and tab switching.
+  Tabs work for any number of groups.
+  A group is a .tabs row plus sibling .scene blocks inside the same <section>;
+  each button's data-scene matches one .scene's data-scene.
+-->
+<script>
+  // Carousel: the track scrolls with snap points; the buttons page it by one view.
+  document.querySelectorAll('.carousel').forEach(function (car) {
+    var track = car.querySelector('.car-track');
+    car.querySelector('.car-prev').addEventListener('click', function () {
+      track.scrollBy({ left: -track.clientWidth, behavior: 'smooth' });
+    });
+    car.querySelector('.car-next').addEventListener('click', function () {
+      track.scrollBy({ left: track.clientWidth, behavior: 'smooth' });
+    });
+  });
+
+  document.querySelectorAll('.tabs').forEach(function (tabs) {
+    var scope = tabs.closest('section');
+    tabs.addEventListener('click', function (e) {
+      var btn = e.target.closest('.tab');
+      if (!btn) return;
+      tabs.querySelectorAll('.tab').forEach(function (b) {
+        b.classList.toggle('is-active', b === btn);
+      });
+      scope.querySelectorAll('.scene').forEach(function (s) {
+        s.classList.toggle('is-active', s.dataset.scene === btn.dataset.scene);
+      });
+    });
+  });
+</script>
+
 </body>
 </html>
